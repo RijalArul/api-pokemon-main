@@ -1,9 +1,36 @@
+const { API_POKEMON_SERVICE } = require('../axios')
+
 class PokemonController {
-  static async getPokemon (req, res) {
+  static async listPokemons (req, res) {
     try {
-      console.log('Halo ini Get Pokemon')
+      const response = await API_POKEMON_SERVICE.get(`pokemons`)
+      const { data } = response.data
+
+      res.status(200).json(data)
     } catch (err) {
-      console.log(err)
+      res.status(500).json({
+        message: 'Internal Server Error',
+        status: false
+      })
+    }
+  }
+
+  static async detailPokemon (req, res) {
+    try {
+      const { id } = req.params
+      const detailPokemon = await API_POKEMON_SERVICE.get(`pokemons/${+id}`)
+      const { data } = detailPokemon
+      res.status(200).json(data)
+    } catch (err) {
+      const { data, status } = err.response
+      if (status == 404) {
+        res.status(status).json(data)
+      } else {
+        res.status(500).json({
+          message: 'Internal Server Error',
+          status: false
+        })
+      }
     }
   }
 }
